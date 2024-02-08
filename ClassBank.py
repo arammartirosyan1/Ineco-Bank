@@ -14,7 +14,6 @@ class Bank:
     def __init__(self, name, type):
         self.name = name
         self.type = type
-        self.payload = {}
 
         match name:
             case "Ineco":
@@ -22,14 +21,14 @@ class Bank:
                     case "I1":
                         self.ins = False
                         self.ben = True
-                        self.payload['key'] = "value"
+                        ben_true()
                     case "I2":
                         self.ins = False
                         self.ben = True
 
 
 def ben_true():
-    global qaxaq, new_data_1, j
+    global qaxaq, new_data_1, j, data, risk
     ls = ["Հաճախորդ", "Հաճախորդի անուն/ազգանուն", "Ապահովադիր", "Ծննդյան ամսաթիվ",
           "ՀԾՀ", "Հաճախորդի անձնագրային տվյալներ", "Հեռախոսահամար", "Էլ. հասցե",
           "Գրանցման հասցե", "Բնակության հասցե", "Շահառու", "ՀՎՀՀ", "Ապահովագրվող գույքի տեսակ",
@@ -252,14 +251,13 @@ def ben_true():
 
                         ls_1["PROPERTY_MARKET_PRICE"] = x[0]
                     if i == 14:
-                        rate = data[14] / data[13]
                         x = str(data[14]).split()
-                        risk = str(float(rate) * int(x[0]) / 100).split('.')[0]
-                        ls_1["POLICY_AMOUNT_CURRENCY"] = "AMD"
-                        ls_1["PROPERTY_INSURANCE_RATE"] = str(rate)
-                        ls_1["PROPERTY_SUM_INSURED"] = x[0]
                         ls_1['PROPERTY_RISK_AMOUNT'] = x[0]
+                        ls_1["PROPERTY_SUM_INSURED"] = x[0]
+                        risk = str(float(0.16) * int(x[0]) / 100).split('.')[0]
                         ls_1['PROPERTY_RISK_PREMIUM'] = risk
+                        ls_1["POLICY_AMOUNT_CURRENCY"] = "AMD"
+                        ls_1["PROPERTY_INSURANCE_RATE"] = "0.16"
                     if i == 15:
                         pass
                     if i == 16:
@@ -282,8 +280,11 @@ def ben_true():
                                         ls_1['PROPERTY_CITY'] = j
                     if i == 17:
                         x = str(data[i]).split()[0]
-                        ls_1["PROPERTY_OWNER_PERSON_SOCIAL_CARD"] = x
-                        ls_1["PROPERTY_OWNER_PERSON_PERS_BPR_USE"] = "1"
+                        if len(x) > 5:
+                            ls_1["PROPERTY_OWNER_PERSON_SOCIAL_CARD"] = x
+                            ls_1["PROPERTY_OWNER_PERSON_PERS_BPR_USE"] = "1"
+                        else:
+                            ls_1["IS_OWNER_PERSON_SAME_INSURED"] = "1"
 
                     if i == 18:
                         x = str(data[i]).split()[0]
@@ -323,8 +324,6 @@ def ben_true():
                             ls_1['PROPERTY_CITY'] = "Այլ"
                         else:
                             ls_1['PROPERTY_CITY'] = j
-                    if i == 17:
-                        ls_1["IS_OWNER_PERSON_SAME_INSURED"] = "1"
 
                     if i == 18:
                         start_date = datetime.date.today()
@@ -334,10 +333,18 @@ def ben_true():
                         ls_1["POLICY_FROM_DATE"] = start
                         ls_1["POLICY_TO_DATE"] = end
 
-    ls_1["POLICY_PAYMENT_SCHEDULE"] = "22674,10.02.2024"
     ####################################
     start_date = datetime.date.today().strftime("%d.%m.%Y")
+    print(str(start_date))
     ls_1["POLICY_CREATION_DATE"] = start_date
+    ls_1["POLICY_PAYMENT_SCHEDULE"] = str(risk + ", " + start_date)
+    num = int(start_date.split('.')[0])
+    start_date = datetime.date.today()
+    while num != 15:
+        num += 1
+        start_date = start_date + datetime.timedelta(days=1)
+
+    print(str(risk + ", " + str(start_date)))
 
 
     ##########################
