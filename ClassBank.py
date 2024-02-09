@@ -390,16 +390,10 @@ def ben_true():
                         end = start_send + datetime.timedelta(days=365)
                         ls_1["POLICY_FROM_DATE"] = start_send.strftime("%d.%m.%Y")
                         ls_1["POLICY_TO_DATE"] = end.strftime("%d.%m.%Y")
-
-                        # Եթե նշված է օր վերցնում ենք հաջորդ ամսվա այդ օրը
                         start_date = datetime.date.today().strftime("%d.%m.%Y")
-                        start = datetime.datetime.strptime(start_date, "%d.%m.%Y")
-                        end_date = start + relativedelta(months=+1)
-                        end = end_date.strftime("%d.%m.%Y")
-                        payment = str(risk), end
                         ls_1["POLICY_CREATION_DATE"] = start_date
+                        payment = str(risk), start_date
                         ls_1["POLICY_PAYMENT_SCHEDULE"] = ", ".join(payment)
-
                 except:
                     if i == 18:
                         # Եթե նշված չի օր վերցնում ենք այս օրը որպես պայմանագրի սկիզբ
@@ -409,15 +403,12 @@ def ben_true():
                         end = end_date.strftime("%d.%m.%Y")
                         ls_1["POLICY_FROM_DATE"] = start
                         ls_1["POLICY_TO_DATE"] = end
-
-                        # Եթե նշված չի օր վերցնում ենք գալիք ամսվա 15ը
-                        start_date = datetime.date.today().strftime("%d.%m.%Y")
-                        start = datetime.datetime.strptime(start_date, "%d.%m.%Y")
-                        end_date = start + relativedelta(months=+1)
-                        end = end_date.strftime("15.%m.%Y")
-                        payment = str(risk), end
-                        ls_1["POLICY_CREATION_DATE"] = start_date
+                        ls_1["POLICY_CREATION_DATE"] = start
+                        payment = str(risk), start
                         ls_1["POLICY_PAYMENT_SCHEDULE"] = ", ".join(payment)
+
+
+
 
 
     ##########################

@@ -1,4 +1,9 @@
 import pandas as pd
+import random
+import datetime
+from datetime import date
+from dateutil.relativedelta import relativedelta
+import sys
 
 ls = ["Հաճախորդ", "Հաճախորդի անուն/ազգանուն", "Ապահովադիր", "Ծննդյան ամսաթիվ",
           "ՀԾՀ", "Հաճախորդի անձնագրային տվյալներ", "Հեռախոսահամար", "Էլ. հասցե",
@@ -6,6 +11,10 @@ ls = ["Հաճախորդ", "Հաճախորդի անուն/ազգանուն", "Ա�
           "Գույքի ապահովագրական արժեք", "Ապահովագրական գումար", "Սակագին", "Ապահովագրվող գույքի հասցե",
           "Սեփականատեր անհատ", "Նոր պայմանագրի սկիզբ"]
 
+ls_city = ['Երևան', 'Արմավիր', 'Արարատ', 'Արագածոտն', 'Կոտայք', 'Շիրակ', 'Լոռի', 'Տավուշ', 'Գեղարքունիք',
+           'Վայոց Ձոր', 'Սյունիք']
+
+ls_1 = {}
 
 ani_to_uni = {"²": "Ա",
                   "³": "ա",
@@ -99,6 +108,7 @@ ani_to_uni = {"²": "Ա",
 
                   }
 
+ls_2 = ["ք․", "ք.", "Ք․", "Ք.", "քաղաք", "Քաղաք", "մ․", "մ.", "Մ․", "Մ.", "մարզ", "Մարզ"]
 
 df = pd.read_excel('accident.xlsx', header=None)
 df.drop(df.index[:2], inplace=True)
@@ -115,6 +125,141 @@ for i in range(len(df)):
     if len(str(data[2])) > 10:
         new = {"": data}
         exc_data = pd.DataFrame(new, index=ls)
-        exc_data.to_excel('Excel_{}.xlsx'.format(i))
+        exc_data.to_excel('News/Excel_{}.xlsx'.format(i))
+
+#########################################################
+        if "Վարկառու/" in data[0]:
+            for i in range(len(data)):
+                try:
+                    if i == 0:
+                        x = str(data[i]).split()
+                        ls_1["IS_INSURED_PHYSICAL"] = "1"
+                except:
+                    print("Error", data[i])
+
+                try:
+                    if i == 2:
+                        x = str(data[i]).split()
+                        ls_1["INSURED_NAME"] = x[0]
+                        ls_1["INSURED_LAST_NAME"] = x[1]
+                        ls_1["INSURED_SECOND_NAME"] = x[2]
+                except:
+                    print("Error", data[i])
+
+                try:
+                    if i == 3:
+                        x = str(data[i]).split()[0]
+                        x = datetime.datetime.strptime(x, "%Y-%m-%d").strftime("%d.%m.%Y")
+                        ls_1["INSURED_BIRTHDAY"] = x
+                except:
+                    print("Error", data[i])
+
+                try:
+                    if i == 4:
+                        x = str(data[i]).strip('.').strip('').split('.')
+                        ls_1["INSURED_SOCIAL_CARD"] = x[0]
+                        if int(x[0][:2]) > 50:
+                            ls_1["INSURED_GENDER"] = "F"
+                        else:
+                            ls_1["INSURED_GENDER"] = "M"
+                except:
+                    print("Error", data[i])
+
+                try:
+                    if i == 5:
+                        x = str(data[i]).split()
+                        ls_1["INSURED_CITIZENSHIP"] = "ՀՀ"
+                        ls_1["INSURED_PASSPORT_NUMBER"] = x[0]
+                        ls_1["INSURED_PASSPORT_ISSUE_DATE"] = x[1].replace('/', '.')
+                        ls_1["INSURED_PASSPORT_AUTHORITY"] = x[2]
+                        start = datetime.datetime.strptime(x[1], "%d/%m/%Y")
+                        end = start + relativedelta(years=+10)
+                        ls_1["INSURED_PASSPORT_EXPIRY_DATE"] = end.strftime("%d.%m.%Y")
+                except:
+                    print("Error", data[i])
+
+                try:
+                    if i == 6:
+                        x = str(data[i]).split('.')[0].strip()
+                        if len(x) == 9:
+                            ls_1["INSURED_MOBILE_PHONE"] = x
+                        else:
+                            x = "0" + x[::-1][:8][::-1]
+                            ls_1["INSURED_MOBILE_PHONE"] = x
+                except:
+                    print("Error", data[i])
+
+                try:
+                    if i == 7:
+                        x = str(data[i]).split()
+                        ls_1["INSURED_MAIL"] = x[0]
+                except:
+                    print("Error", data[i])
+
+                try:
+                    if i == 8:
+                        new_data = str(data[i]).replace(',', " ").strip()
+                        new_data = new_data.split(" ")
+                        for k in new_data[0:2]:
+                            for j in ls_city:
+                                if j in k:
+                                    new_data_1 = str(data[i]).replace(k, '')
+                                    for q in ls_2:
+                                        if q in data[i]:
+                                            qaxaq = q
+                                    new_data_1 = new_data_1.replace(qaxaq, "").strip().strip(",").strip()
+                                    ls_1["INSURED_REG_COUNTRY"] = "ARM"
+                                    ls_1["INSURED_REG_REGION"] = j
+                                    ls_1['INSURED_REG_FULL_ADDRESS'] = new_data_1
+                                    if j == "Տավուշ":
+                                        ls_1['INSURED_REG_CITY'] = "Այլ"
+                                    else:
+                                        ls_1['INSURED_REG_CITY'] = j
+                except:
+                    if i == 8:
+                        new_data_1 = str(new_data_1).strip().strip(",").strip()
+                        ls_1["INSURED_REG_COUNTRY"] = "ARM"
+                        ls_1["INSURED_REG_REGION"] = j
+                        ls_1['INSURED_REG_FULL_ADDRESS'] = new_data_1
+                        if j == "Տավուշ":
+                            ls_1['INSURED_REG_CITY'] = "Այլ"
+                        else:
+                            ls_1['INSURED_REG_CITY'] = j
+
+                try:
+                    if i == 9:
+                        new_data = str(data[i]).replace(',', " ").strip()
+                        new_data = new_data.split(" ")
+                        for k in new_data[0:2]:
+                            for j in ls_city:
+                                if j in k:
+                                    new_data_1 = str(data[i]).replace(k, '')
+                                    for q in ls_2:
+                                        if q in data[i]:
+                                            qaxaq = q
+                                    new_data_1 = new_data_1.replace(qaxaq, "").strip().strip(",").strip()
+                                    ls_1["INSURED_LIVE_COUNTRY"] = "ARM"
+                                    ls_1["INSURED_LIVE_REGION"] = j
+                                    ls_1['INSURED_LIVE_FULL_ADDRESS'] = new_data_1
+                                    if j == "Տավուշ":
+                                        ls_1['INSURED_LIVE_CITY'] = "Այլ"
+                                    else:
+                                        ls_1['INSURED_LIVE_CITY'] = j
+                                        i += 1
+                except:
+                    if i == 9:
+                        try:
+                            new_data_1 = str(new_data_1).strip().strip(",").strip()
+                            ls_1["INSURED_LIVE_COUNTRY"] = "ARM"
+                            ls_1["INSURED_LIVE_REGION"] = j
+                            ls_1['INSURED_LIVE_FULL_ADDRESS'] = new_data_1
+                            if j == "Տավուշ":
+                                ls_1['INSURED_LIVE_CITY'] = "Այլ"
+                            else:
+                                ls_1['INSURED_LIVE_CITY'] = j
+                        except:
+                            ls_1["IS_INSURED_SAME_REG_LIVE_ADDRESS"] = '1'
 
 
+l = pd.Series(ls_1)
+l.to_json('News/Json.json', indent=2, force_ascii=False)
