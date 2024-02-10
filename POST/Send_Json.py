@@ -3,7 +3,7 @@ import json
 import pandas as pd
 
 url = "https://testimex.efes.am/webservice/policy"
-data = pd.read_json('C:/Users/AramMartirosyan/OneDrive - EFES ICJSC/Desktop/INECO/NEWS/New_Format.json',  orient='index')[0]
+data = pd.read_json('C:/Users/aramm/OneDrive - EFES ICJSC/Desktop/INECO/ACCIDENT/News/PA_Format0.json',  orient='index')[0]
 data = dict(data)
 
 payload = json.dumps(data)
@@ -16,7 +16,7 @@ headers = {
 response = requests.request("POST", url, headers=headers, data=payload)
 if response.status_code == 200:
   result = json.loads(response.text)
-  print(result)
+  print(result['result'])
 else:
   print(response.text)
 
