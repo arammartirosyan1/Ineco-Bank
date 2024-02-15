@@ -21,6 +21,7 @@ ani_to_uni = {"²": "Ա",
                   "´": "Բ",
                   "µ": "բ",
                   "¶": "Գ",
+              
                   "·": "գ",
                   "¸": "Դ",
                   "¹": "դ",
@@ -410,7 +411,8 @@ for row in range(len(df)):
         import pandas as pd
 
         url = "https://testimex.efes.am/webservice/policy"
-        data = pd.read_json('C:/Users/aramm/OneDrive - EFES ICJSC/Desktop/INECO/ACCIDENT/News/PA_Format0.json',
+
+        data = pd.read_json('C:/Users/AramMartirosyan/OneDrive - EFES ICJSC/Desktop/INECO/ACCIDENT/News/PA_Format0.json',
                             orient='index')[0]
         data = dict(data)
 

@@ -3,22 +3,24 @@ import json
 import pandas as pd
 
 url = "https://testimex.efes.am/webservice/policy"
-data = pd.read_json('C:/Users/aramm/OneDrive - EFES ICJSC/Desktop/INECO/ACCIDENT/News/PA_Format0.json',  orient='index')[0]
+data = pd.read_json('C:/Users/AramMartirosyan/OneDrive - EFES ICJSC/Desktop/INECO/ACCIDENT/News/PA_Format0.json',  orient='index')[0]
 data = dict(data)
 
 payload = json.dumps(data)
 
 headers = {
   'Content-Type': 'application/json',
-  'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb250ZXh0Ijp7ImNsaWVudCI6eyJpZCI6IjI3NyIsIm5hbWUiOiJJa2h0c3lhbmRyIn0sImVudiI6IlBST0QifSwiaXNzIjoid3d3LmltZXguYW0iLCJpYXQiOjE3MDc0ODE4NzEsImV4cCI6MTcwNzY1NDY3MX0.aWBYxeI0NnQZqfc63flgEbm2TAABnGPv_t6be2h_7wM'
+  'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb250ZXh0Ijp7ImNsaWVudCI6eyJpZCI6IjI3NyIsIm5hbWUiOiJJa2h0c3lhbmRyIn0sImVudiI6IlBST0QifSwiaXNzIjoid3d3LmltZXguYW0iLCJpYXQiOjE3MDc3NDUzOTYsImV4cCI6MTcwNzkxODE5Nn0.KnEVjdf3m8BC1at-3_qbmWKODXu88JovFaJ8ohmeWJQ'
 }
 
 response = requests.request("POST", url, headers=headers, data=payload)
 if response.status_code == 200:
-  result = json.loads(response.text)
-  print(result['result'])
+    print("Success")
+    result = json.loads(response.text)
+    print(result)
 else:
-  print(response.text)
+    print("Error")
+    print(response.text, response.status_code)
 
 
 
